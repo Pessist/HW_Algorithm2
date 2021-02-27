@@ -51,6 +51,7 @@ namespace Lesson2_1
 
             public void AddNodeAfter(Node node, int value)
             {
+
                 var newNode = new Node { Value = value };
 
                 var nextItem = node.NextNode;
@@ -58,14 +59,27 @@ namespace Lesson2_1
                 node.NextNode = newNode;
 
                 newNode.NextNode = nextItem;
-                //newNode.PrevNode = prevItem;
+
+                newNode.PrevNode = node;
+
+                if (nextItem != null)
+                    nextItem.PrevNode = newNode;
 
                 count++;
             }
 
             public Node FindNode(int searchValue)
             {
-                throw new NotImplementedException();
+                var current = head;
+                while (current != null)
+                {
+                    if (current.Value == searchValue)
+                    {
+                        return current;
+                    }
+                    current = current.NextNode;
+                }
+                return null;
             }
 
             public int GetCount() => count;
@@ -73,31 +87,147 @@ namespace Lesson2_1
 
             public void RemoveNode(int index)
             {
-                throw new NotImplementedException();
+                var node = head;
+
+                if (index == 0)
+                {
+                    head = node.NextNode;
+                    head.PrevNode = null;
+                }
+                else
+                {
+                    var deleteNode = GetNodeByIndex(index);
+                    node = head.NextNode;
+
+
+                    //поиск удаляемого узла
+                    while (deleteNode != null)
+                    {
+                        if (node.Value == deleteNode.Value)
+                        {
+                            break;
+                        }
+                        node = node.NextNode;
+                    }
+
+                    if (deleteNode != null)
+                    {
+                        // если узел не последний
+                        if (deleteNode.NextNode != null)
+                        {
+                            deleteNode.NextNode.PrevNode = deleteNode.PrevNode;
+                        }
+                        else
+                        {
+                            // если последний, переустанавливаем tail
+                            tail = deleteNode.PrevNode;
+                        }
+
+                        // если узел не первый
+                        if (deleteNode.PrevNode != null)
+                        {
+                            deleteNode.PrevNode.NextNode = deleteNode.NextNode;
+                        }
+                        else
+                        {
+                            // если первый, переустанавливаем head
+                            head = deleteNode.NextNode;
+                        }
+                        count--;
+                    }
+
+                }
+            }
+            public Node GetNodeByIndex(int Index)
+            {
+                Node node;
+
+                if (count - 1 >= Index)
+                {
+                    node = head;
+                    for (int i = 1; i <= Index; i++)
+                    {
+                        node = node.NextNode;
+                    }
+                }
+                else
+                {
+                    node = tail;
+                    for (int i = count - 1; i > Index; i--)
+                    {
+                        node = node.PrevNode;
+                    }
+                }
+                return node;
             }
 
             public void RemoveNode(Node node)
             {
-                throw new NotImplementedException();
+                var current = head;
+
+                // поиск удаляемого узла
+                while (current != null)
+                {
+                    if (current.Value == node.Value)
+                    {
+                        break;
+                    }
+                    current = current.NextNode;
+                }
+
+                if (current != null)
+                {
+                    // если узел не последний
+                    if (current.NextNode != null)
+                    {
+                        current.NextNode.PrevNode = current.PrevNode;
+                    }
+                    else
+                    {
+                        // если последний, переустанавливаем tail
+                        tail = current.PrevNode;
+                    }
+
+                    // если узел не первый
+                    if (current.PrevNode != null)
+                    {
+                        current.PrevNode.NextNode = current.NextNode;
+                    }
+                    else
+                    {
+                        // если первый, переустанавливаем head
+                        head = current.NextNode;
+                    }
+                    count--;
+                }
             }
         }
 
         static void Main(string[] args)
         {
-            var list = new DoublyLinkedList();
+            var linkedList = new DoublyLinkedList();
 
             var root = new Node { Value = 12 };
-
-            list.AddNode(35);
-            list.AddNode(42);
-            list.AddNode(55);
-            list.AddNode(125);
+            var secondNode = new Node { Value = 18 };
+            root.NextNode = secondNode;
+            secondNode.PrevNode = root;
 
             var addAfterNode = new DoublyLinkedList();
-
             addAfterNode.AddNodeAfter(root, 47);
 
-            var count = list.GetCount();
+            linkedList.AddNode(35);
+            linkedList.AddNode(42);
+            linkedList.AddNode(55);
+            linkedList.AddNode(125);
+            linkedList.AddNode(133);
+
+            var testNode = linkedList.FindNode(125);
+
+            linkedList.RemoveNode(2);
+            linkedList.RemoveNode(testNode);
+
+
+            var count = linkedList.GetCount();
 
         }
     }
