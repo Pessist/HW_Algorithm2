@@ -5,6 +5,15 @@ namespace Lesson2_1
 {
     class Program
     {
+        public class TestCase
+        {
+            public int AddNode { get; set; }
+            public int AddNodeAfter { get; set; }
+            public int FindNode { get; set; }
+            public int IndexNod { get; set; }
+            public int Count { get; set; }
+        }
+
         public sealed class Node
         {
             public int Value { get; set; }
@@ -28,6 +37,8 @@ namespace Lesson2_1
             private int count = 0;
             private Node head;
             private Node tail;
+
+            public int GetCount() => count;
 
             public void AddNode(int value) // добавление на конец списка нового элемента.
             {
@@ -68,23 +79,6 @@ namespace Lesson2_1
                 count++;
             }
 
-            public Node FindNode(int searchValue)
-            {
-                var current = head;
-                while (current != null)
-                {
-                    if (current.Value == searchValue)
-                    {
-                        return current;
-                    }
-                    current = current.NextNode;
-                }
-                return null;
-            }
-
-            public int GetCount() => count;
-
-
             public void RemoveNode(int index)
             {
                 var node = head;
@@ -116,6 +110,7 @@ namespace Lesson2_1
                         if (deleteNode.NextNode != null)
                         {
                             deleteNode.NextNode.PrevNode = deleteNode.PrevNode;
+
                         }
                         else
                         {
@@ -133,11 +128,14 @@ namespace Lesson2_1
                             // если первый, переустанавливаем head
                             head = deleteNode.NextNode;
                         }
+                        deleteNode.NextNode = null;
+                        deleteNode.PrevNode = null;
                         count--;
                     }
 
                 }
             }
+
             public Node GetNodeByIndex(int Index)
             {
                 Node node;
@@ -198,8 +196,24 @@ namespace Lesson2_1
                         // если первый, переустанавливаем head
                         head = current.NextNode;
                     }
+                    current.NextNode = null;
+                    current.PrevNode = null;
                     count--;
                 }
+            }
+
+            public Node FindNode(int searchValue)
+            {
+                var current = head;
+                while (current != null)
+                {
+                    if (current.Value == searchValue)
+                    {
+                        return current;
+                    }
+                    current = current.NextNode;
+                }
+                return null;
             }
         }
 
@@ -207,27 +221,144 @@ namespace Lesson2_1
         {
             var linkedList = new DoublyLinkedList();
 
-            var root = new Node { Value = 12 };
-            var secondNode = new Node { Value = 18 };
-            root.NextNode = secondNode;
-            secondNode.PrevNode = root;
+            // Тест на добавление, поиск ноды и количество элементов в списке
+            var testData = new TestCase[4];
+            testData[0] = new TestCase()
+            {
+                AddNode = 35,
+                FindNode = 35,
+                IndexNod = 0,
+                Count = 1
 
-            var addAfterNode = new DoublyLinkedList();
-            addAfterNode.AddNodeAfter(root, 47);
+            };
+            testData[1] = new TestCase()
+            {
+                AddNode = 42,
+                FindNode = 42,
+                IndexNod = 1,
+                Count = 2
+            };
+            testData[2] = new TestCase()
+            {
+                AddNode = 55,
+                FindNode = 55,
+                IndexNod = 2,
+                Count = 3
+            };
+            testData[3] = new TestCase()
+            {
+                AddNode = 125,
+                FindNode = 125,
+                IndexNod = 3,
+                Count = 4
+            };
 
-            linkedList.AddNode(35);
-            linkedList.AddNode(42);
-            linkedList.AddNode(55);
-            linkedList.AddNode(125);
-            linkedList.AddNode(133);
 
-            var testNode = linkedList.FindNode(125);
+            foreach (var testCase in testData)
+            {
+                linkedList.AddNode(testCase.AddNode);
+                var resultAdd = linkedList.FindNode(testCase.FindNode);
+                var expected = linkedList.GetNodeByIndex(testCase.IndexNod);
+                var countNode = linkedList.GetCount();
+                if (resultAdd == expected)
+                {
+                    Console.WriteLine("Все верно!");
+                }
+                else
+                {
+                    Console.WriteLine("Ошибка!");
+                }
+                if (countNode == testCase.Count)
+                {
+                    Console.WriteLine("Все верно!");
+                }
+                else
+                {
+                    Console.WriteLine("Ошибка!");
+                }
+            }
 
-            linkedList.RemoveNode(2);
+            //Тест на добавление ноды после определенного элемента
+
+            var testData2 = new TestCase[2];
+            testData2[0] = new TestCase()
+            {
+                AddNode = 52,
+                AddNodeAfter = 42,
+                FindNode = 52,
+                IndexNod = 2
+            };
+            testData2[1] = new TestCase()
+            {
+                AddNode = 67,
+                AddNodeAfter = 55,
+                FindNode = 67,
+                IndexNod = 4
+            };
+            foreach (var testCase2 in testData2)
+            {
+                var addNodeAfter = linkedList.FindNode(testCase2.AddNodeAfter);
+                linkedList.AddNodeAfter(addNodeAfter, testCase2.AddNode);
+                var resultAdd = linkedList.FindNode(testCase2.FindNode);
+                var expected = linkedList.GetNodeByIndex(testCase2.IndexNod);
+                if (resultAdd == expected)
+                {
+                    Console.WriteLine("Все верно!");
+                }
+                else
+                {
+                    Console.WriteLine("Ошибка!");
+                }
+            }
+
+            // Тест на удаление ноды по заданному индексу и по заданному элементу
+
+            var testNode = linkedList.FindNode(52);
+            var testIndex = linkedList.GetNodeByIndex(3);
+            linkedList.RemoveNode(3);
             linkedList.RemoveNode(testNode);
 
+            if (testNode.PrevNode == null && testNode.NextNode == null)
+            {
+                Console.WriteLine("Все верно!");
+            }
+            else
+            {
+                Console.WriteLine("Ошибка!");
+            }
 
-            var count = linkedList.GetCount();
+            if (testIndex.NextNode == null && testIndex.PrevNode == null)
+            {
+                Console.WriteLine("Все верно!");
+            }
+            else
+            {
+                Console.WriteLine("Ошибка!");
+            }
+
+
+            //Переменные при тестировании программы до создания класса TestCase
+
+            //var root = new Node { Value = 12 };
+            //var secondNode = new Node { Value = 18 };
+            //root.NextNode = secondNode;
+            //secondNode.PrevNode = root;
+
+            //var addAfterNode = new DoublyLinkedList();
+            //addAfterNode.AddNodeAfter(root, 47);
+
+            //linkedList.AddNode(35);
+            //linkedList.AddNode(42);
+            //linkedList.AddNode(55);
+            //linkedList.AddNode(125);
+            //linkedList.AddNode(133);
+
+            //var testNodeT = linkedList.FindNode(125);
+
+            //linkedList.RemoveNode(2);
+            //linkedList.RemoveNode(testNodeT);
+
+            //var count = linkedList.GetCount();
 
         }
     }
